@@ -1,0 +1,35 @@
+version: '3.8'
+
+networks:
+  pipelines:
+      driver: bridge
+      ipam:
+          driver: default
+          config:
+              - subnet: "172.18.0.0/16"
+                gateway: "172.18.0.1"
+
+services:
+  postgres:
+    image: postgres:latest
+    container_name: postgres_container
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: test
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+  
+  python_app:
+    build:
+      context: .
+      dockerfile: app/images/python/Dockerfile
+    volumes:
+      - ./app:/app
+    restart: always
+    tty: true
+
+volumes:
+  postgres_data:
